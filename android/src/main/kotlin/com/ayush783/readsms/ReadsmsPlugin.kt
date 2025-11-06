@@ -52,7 +52,9 @@ class ReadsmsPlugin: FlutterPlugin, EventChannel.StreamHandler,BroadcastReceiver
       val smsList = Telephony.Sms.Intents.getMessagesFromIntent(p1)
       val messagesGroupedByOriginatingAddress = smsList.groupBy { it.originatingAddress }
       messagesGroupedByOriginatingAddress.forEach { group ->
-        processIncomingSms(context, group.value)
+        val (subId, slotIndex) = extractSubIdAndSlot(context, p1, smsList)
+
+        processIncomingSms(context, group.value, slotIndex)
       }
       
       // for (sms in smsList) {
@@ -64,16 +66,17 @@ class ReadsmsPlugin: FlutterPlugin, EventChannel.StreamHandler,BroadcastReceiver
     }
   }
 
-  private fun processIncomingSms(context: Context, smsList: List<SmsMessage>) {
-    val messageMap = smsList.first().toMap()
+  private fun processIncomingSms(context: Context, smsList: List<SmsMessage>, int slotIndex) {
+    val messageMap = smsList.first().toMutableMap()
     smsList.forEachIndexed { index, smsMessage ->
       if (index > 0) {
         messageMap["message_body"] = (messageMap["message_body"] as String)
           .plus(smsMessage.messageBody.trim())
+        messageMap["sim_id"] = slotIndex
       }
     }
 
-    var resultSms = listOf(messageMap["message_body"], messageMap["originating_address"], messageMap["timestamp"])
+    var resultSms = listOf(messageMap["message_body"], messageMap["originating_address"], messageMap["timestamp"], messageMap["sim_id"])
     eventSink?.success(resultSms)
   }
 
@@ -90,6 +93,35 @@ class ReadsmsPlugin: FlutterPlugin, EventChannel.StreamHandler,BroadcastReceiver
       smsMap["service_center_address"] = serviceCenterAddress
     }
     return smsMap
+  }
+
+  fun extractSubIdAndSlot(context: Context, intent: Intent, smsList: Array<SmsMessage>): Pair<Int, Int> {
+    val invalid = SubscriptionManager.INVALID_SUBSCRIPTION_ID
+
+    // 1) Пытаемся достать subId из интента (новые/старые ключи)
+    val subIdFromIntent =
+      intent.getIntExtra(SubscriptionManager.EXTRA_SUBSCRIPTION_INDEX, invalid)
+        .takeIf { it != invalid }
+        ?: intent.getIntExtra(SubscriptionManager.EXTRA_SUBSCRIPTION_ID, invalid)
+          .takeIf { it != invalid }
+        ?: intent.extras?.getInt("subscription", invalid)?.takeIf { it != invalid }
+
+    // 2) Если не вышло — пробуем у самого сообщения
+    val subId = subIdFromIntent
+      ?: smsList.firstOrNull()?.let { msg ->
+        // доступно не на всех API, но часто есть
+        try { msg.subscriptionId } catch (_: Throwable) { invalid }
+      } ?: invalid
+
+    // 3) Преобразуем subId -> slotIndex (0/1/…)
+    val slotIndex = if (subId != invalid) {
+      SubscriptionManager.getSlotIndex(subId)
+    } else {
+      // на совсем старых девайсах бывает явный extra "slot"
+      intent.extras?.getInt("slot", -1) ?: -1
+    }
+
+    return subId to slotIndex // slotIndex: 0 -> SIM1, 1 -> SIM2
   }
 
   override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
