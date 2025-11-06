@@ -21,5 +21,5 @@ class SMS {
         timeReceived = DateTime.fromMillisecondsSinceEpoch(
           int.parse(data[2] as String),
         ),
-        simId = data[4] as int;
+        simId = data[3] as int;
 }
