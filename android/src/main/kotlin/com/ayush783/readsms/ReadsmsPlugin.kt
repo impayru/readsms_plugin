@@ -123,7 +123,7 @@ class ReadsmsPlugin: FlutterPlugin, EventChannel.StreamHandler,BroadcastReceiver
       intent?.extras?.getInt("slot", -1) ?: -1
     }
 
-    return subId to slotIndex // slotIndex: 0 -> SIM1, 1 -> SIM2
+    return return (subId ?: 0) to (slotIndex ?: 0) // slotIndex: 0 -> SIM1, 1 -> SIM2
   }
 
   override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
