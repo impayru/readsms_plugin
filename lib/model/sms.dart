@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 class SMS {
   /// The body of the message received
   final String body;
@@ -8,7 +10,7 @@ class SMS {
   /// The time when sms is received
   final DateTime timeReceived;
 
-  final String simId;
+  final Int simId;
 
   SMS({required this.body, required this.sender, required this.timeReceived, required this.simId});
 
@@ -21,5 +23,5 @@ class SMS {
         timeReceived = DateTime.fromMillisecondsSinceEpoch(
           int.parse(data[2] as String),
         ),
-        simId = data[4] as String;
+        simId = data[4] as Int;
 }

@@ -66,7 +66,7 @@ class ReadsmsPlugin: FlutterPlugin, EventChannel.StreamHandler,BroadcastReceiver
     }
   }
 
-  private fun processIncomingSms(context: Context, smsList: List<SmsMessage>, int slotIndex) {
+  private fun processIncomingSms(context: Context, smsList: List<SmsMessage>, slotIndex: int) {
     val messageMap = smsList.first().toMutableMap()
     smsList.forEachIndexed { index, smsMessage ->
       if (index > 0) {
@@ -95,16 +95,16 @@ class ReadsmsPlugin: FlutterPlugin, EventChannel.StreamHandler,BroadcastReceiver
     return smsMap
   }
 
-  fun extractSubIdAndSlot(context: Context, intent: Intent, smsList: Array<SmsMessage>): Pair<Int, Int> {
+  fun extractSubIdAndSlot(context: Context?, intent: Intent?, smsList: Array<SmsMessage>): Pair<Int, Int> {
     val invalid = SubscriptionManager.INVALID_SUBSCRIPTION_ID
 
     // 1) Пытаемся достать subId из интента (новые/старые ключи)
     val subIdFromIntent =
-      intent.getIntExtra(SubscriptionManager.EXTRA_SUBSCRIPTION_INDEX, invalid)
+      intent?.getIntExtra(SubscriptionManager.EXTRA_SUBSCRIPTION_INDEX, invalid)
         .takeIf { it != invalid }
-        ?: intent.getIntExtra(SubscriptionManager.EXTRA_SUBSCRIPTION_ID, invalid)
+        ?: intent?.getIntExtra(SubscriptionManager.EXTRA_SUBSCRIPTION_ID, invalid)
           .takeIf { it != invalid }
-        ?: intent.extras?.getInt("subscription", invalid)?.takeIf { it != invalid }
+        ?: intent?.extras?.getInt("subscription", invalid)?.takeIf { it != invalid }
 
     // 2) Если не вышло — пробуем у самого сообщения
     val subId = subIdFromIntent
@@ -118,7 +118,7 @@ class ReadsmsPlugin: FlutterPlugin, EventChannel.StreamHandler,BroadcastReceiver
       SubscriptionManager.getSlotIndex(subId)
     } else {
       // на совсем старых девайсах бывает явный extra "slot"
-      intent.extras?.getInt("slot", -1) ?: -1
+      intent?.extras?.getInt("slot", -1) ?: -1
     }
 
     return subId to slotIndex // slotIndex: 0 -> SIM1, 1 -> SIM2
