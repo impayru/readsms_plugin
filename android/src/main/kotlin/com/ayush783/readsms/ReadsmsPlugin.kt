@@ -113,7 +113,7 @@ class ReadsmsPlugin: FlutterPlugin, EventChannel.StreamHandler,BroadcastReceiver
         // доступно не на всех API, но часто есть
         try { msg.subscriptionId } catch (_: Throwable) { invalid }
       } ?: invalid*/
-    val subId = invalid
+    val subId = subIdFromIntent
 
     // 3) Преобразуем subId -> slotIndex (0/1/…)
     val slotIndex = if (subId != invalid) {
