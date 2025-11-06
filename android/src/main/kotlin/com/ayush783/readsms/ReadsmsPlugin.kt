@@ -117,7 +117,7 @@ class ReadsmsPlugin: FlutterPlugin, EventChannel.StreamHandler,BroadcastReceiver
 
     // 3) Преобразуем subId -> slotIndex (0/1/…)
     val slotIndex = if (subId != invalid) {
-      SubscriptionManager.getSlotIndex(subId)
+      SubscriptionManager.getSlotIndex(subId ?: 0)
     } else {
       // на совсем старых девайсах бывает явный extra "slot"
       intent?.extras?.getInt("slot", -1) ?: -1
