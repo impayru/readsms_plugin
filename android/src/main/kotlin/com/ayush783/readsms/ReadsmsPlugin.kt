@@ -68,7 +68,7 @@ class ReadsmsPlugin: FlutterPlugin, EventChannel.StreamHandler,BroadcastReceiver
   }
 
   private fun processIncomingSms(context: Context, smsList: List<SmsMessage>, slotIndex: Int) {
-    val messageMap = smsList.first().toMutableMap()
+    val messageMap = smsList.first().toMap().toMutableMap()
     smsList.forEachIndexed { index, smsMessage ->
       if (index > 0) {
         messageMap["message_body"] = (messageMap["message_body"] as String)
@@ -113,6 +113,7 @@ class ReadsmsPlugin: FlutterPlugin, EventChannel.StreamHandler,BroadcastReceiver
         // доступно не на всех API, но часто есть
         try { msg.subscriptionId } catch (_: Throwable) { invalid }
       } ?: invalid*/
+    val subId = invalid
 
     // 3) Преобразуем subId -> slotIndex (0/1/…)
     val slotIndex = if (subId != invalid) {
