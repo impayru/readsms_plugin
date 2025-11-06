@@ -67,7 +67,7 @@ class ReadsmsPlugin: FlutterPlugin, EventChannel.StreamHandler,BroadcastReceiver
     }
   }
 
-  private fun processIncomingSms(context: Context, smsList: List<SmsMessage>, slotIndex: int) {
+  private fun processIncomingSms(context: Context, smsList: List<SmsMessage>, slotIndex: Int) {
     val messageMap = smsList.first().toMutableMap()
     smsList.forEachIndexed { index, smsMessage ->
       if (index > 0) {
@@ -103,16 +103,16 @@ class ReadsmsPlugin: FlutterPlugin, EventChannel.StreamHandler,BroadcastReceiver
     val subIdFromIntent =
       intent?.getIntExtra(SubscriptionManager.EXTRA_SUBSCRIPTION_INDEX, invalid)
         .takeIf { it != invalid }
-        ?: intent?.getIntExtra(SubscriptionManager.EXTRA_SUBSCRIPTION_ID, invalid)
-          .takeIf { it != invalid }
+        //?: intent?.getIntExtra(SubscriptionManager.EXTRA_SUBSCRIPTION_ID, invalid)
+          //.takeIf { it != invalid }
         ?: intent?.extras?.getInt("subscription", invalid)?.takeIf { it != invalid }
 
     // 2) Если не вышло — пробуем у самого сообщения
-    val subId = subIdFromIntent
+    /*val subId = subIdFromIntent
       ?: smsList.firstOrNull()?.let { msg ->
         // доступно не на всех API, но часто есть
         try { msg.subscriptionId } catch (_: Throwable) { invalid }
-      } ?: invalid
+      } ?: invalid*/
 
     // 3) Преобразуем subId -> slotIndex (0/1/…)
     val slotIndex = if (subId != invalid) {
