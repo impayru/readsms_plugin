@@ -98,7 +98,7 @@ class ReadsmsPlugin: FlutterPlugin, EventChannel.StreamHandler,BroadcastReceiver
 
   fun extractSubIdAndSlot(context: Context?, intent: Intent?, smsList: Array<SmsMessage>): Pair<Int, Int> {
 
-    val sm: SubscriptionManager =
+    /*val sm: SubscriptionManager =
       context.getSystemService(Context.TELEPHONY_SUBSCRIPTION_SERVICE) as SubscriptionManager
 
     val info: SubscriptionInfo? = sm.getActiveSubscriptionInfo(subscriptionId)
@@ -107,7 +107,7 @@ class ReadsmsPlugin: FlutterPlugin, EventChannel.StreamHandler,BroadcastReceiver
       //val carrierName: String? = info.getCarrierName().toString()
       val simSlotIndex: Int = info.getSimSlotIndex() // 0 или 1
       return simSlotIndex;
-    }
+    }TODO: test */
 
     val invalid = SubscriptionManager.INVALID_SUBSCRIPTION_ID
 
