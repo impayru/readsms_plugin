@@ -97,6 +97,18 @@ class ReadsmsPlugin: FlutterPlugin, EventChannel.StreamHandler,BroadcastReceiver
   }
 
   fun extractSubIdAndSlot(context: Context?, intent: Intent?, smsList: Array<SmsMessage>): Pair<Int, Int> {
+
+    val sm: SubscriptionManager =
+      context.getSystemService(Context.TELEPHONY_SUBSCRIPTION_SERVICE) as SubscriptionManager
+
+    val info: SubscriptionInfo? = sm.getActiveSubscriptionInfo(subscriptionId)
+
+    if (info != null) {
+      //val carrierName: String? = info.getCarrierName().toString()
+      val simSlotIndex: Int = info.getSimSlotIndex() // 0 или 1
+      return simSlotIndex;
+    }
+
     val invalid = SubscriptionManager.INVALID_SUBSCRIPTION_ID
 
     // 1) Пытаемся достать subId из интента (новые/старые ключи)
