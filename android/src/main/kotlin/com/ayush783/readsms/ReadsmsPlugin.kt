@@ -106,7 +106,7 @@ class ReadsmsPlugin: FlutterPlugin, EventChannel.StreamHandler,BroadcastReceiver
     if (info != null) {
       //val carrierName: String? = info.getCarrierName().toString()
       val simSlotIndex: Int = info.getSimSlotIndex() // 0 или 1
-      return simSlotIndex;
+      return (subscriptionId, simSlotIndex);
     }TODO: test */
 
     val invalid = SubscriptionManager.INVALID_SUBSCRIPTION_ID
